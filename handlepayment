@@ -1,0 +1,30 @@
+const handlePayment = async () => {
+    try {
+      const stripe = await stripePromise; // Ensure Stripe is loaded
+      const response = await fetch('http://localhost:4000/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ totalAmount: total }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+  
+      const { id } = await response.json();
+      const result = await stripe.redirectToCheckout({ sessionId: id });
+  
+      if (result.error) {
+        console.error('Payment error:', result.error.message);
+        alert('Payment failed: ' + result.error.message);
+      } else {
+        // Clear the cart and local storage if payment was successful
+        setClearCart(true);
+        localStorage.clear();
+        alert('Payment Successful!');
+      }
+    } catch (error) {
+      console.error('Error during payment:', error);
+      alert('Error during payment: ' + error.message);
+    }
+  };
